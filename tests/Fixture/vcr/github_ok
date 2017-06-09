@@ -1,0 +1,22 @@
+
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/users/lorenzo'
+        headers:
+            Host: api.github.com
+            Connection: close
+            User-Agent: CakePHP
+    response:
+        status:
+            http_version: '1.1'
+            code: '200'
+            message: OK
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 09 Jun 2017 20:59:55 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '1159'
+            Connection: close
+            Status: '200 OK'
+        body: '{"login":"lorenzo","id":37621,"avatar_url":"https://avatars0.githubusercontent.com/u/37621?v=3","gravatar_id":"","url":"https://api.github.com/users/lorenzo","html_url":"https://github.com/lorenzo","followers_url":"https://api.github.com/users/lorenzo/followers","following_url":"https://api.github.com/users/lorenzo/following{/other_user}","gists_url":"https://api.github.com/users/lorenzo/gists{/gist_id}","starred_url":"https://api.github.com/users/lorenzo/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/lorenzo/subscriptions","organizations_url":"https://api.github.com/users/lorenzo/orgs","repos_url":"https://api.github.com/users/lorenzo/repos","events_url":"https://api.github.com/users/lorenzo/events{/privacy}","received_events_url":"https://api.github.com/users/lorenzo/received_events","type":"User","site_admin":false,"name":"José Lorenzo Rodríguez","company":"Bownty","blog":"http://twitter.com/jose_zap","location":"Copenhagen, Denmark","email":null,"hireable":null,"bio":null,"public_repos":120,"public_gists":79,"followers":486,"following":0,"created_at":"2008-12-01T20:52:41Z","updated_at":"2017-06-06T19:13:19Z"}'

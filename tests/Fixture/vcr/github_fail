@@ -1,0 +1,29 @@
+
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/users/nopenopenope'
+        headers:
+            Host: api.github.com
+            Connection: close
+            User-Agent: CakePHP
+    response:
+        status:
+            http_version: '1.1'
+            code: '500'
+            message: OK
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 09 Jun 2017 20:59:55 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '1154'
+            Connection: close
+            Status: '500 LOL'
+            X-RateLimit-Limit: '60'
+            X-RateLimit-Remaining: '49'
+            X-RateLimit-Reset: '1497044500'
+            Cache-Control: 'public, max-age=60, s-maxage=60'
+            Vary: 'Accept, Accept-Encoding'
+            ETag: '"d92874502a12707293b1b17d9338fb7d"'
+            Last-Modified: 'Sat, 27 Feb 2016 14:00:53 GMT'
+        body: '<html><title>hahah</title></html>'

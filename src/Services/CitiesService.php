@@ -9,7 +9,7 @@ class CitiesService
 
     protected $cities, $redis;
 
-    public function __construct($citiesTable, $redis)
+    public function __construct($citiesTable, $redis, $stripe, $mq)
     {
         $this->cities = $citiesTable;
         $this->redis = $redis;
@@ -30,6 +30,8 @@ class CitiesService
             throw new \RuntimeException('You are bad');
         }
         $ok = $this->cities->save($city);
+        $this->mq->emit('city created');
+        $this->stripe->increaseUsage('city');
         if ($ok) {
             return $city;
         }

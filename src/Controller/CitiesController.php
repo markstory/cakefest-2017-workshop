@@ -83,13 +83,15 @@ class CitiesController extends AppController
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $city = $this->Cities->patchEntity($city, $this->request->getData());
-            if ($this->Cities->save($city)) {
-                $this->Flash->success(__('The city has been saved.'));
+            $command = $this->makeAction('editCity');
+            $result = $command($this->request->getData());
+            if ($result->isOk()) {
+                $this->Flash->success($result->getMessage());
 
                 return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error($result->getMessage());
             }
-            $this->Flash->error(__('The city could not be saved. Please, try again.'));
         }
         $countries = $this->Cities->Countries->find('list', ['limit' => 200]);
         $this->set(compact('city', 'countries'));
