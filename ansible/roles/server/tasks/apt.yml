@@ -1,0 +1,26 @@
+---
+- name: Update apt
+  sudo: yes
+  apt: update_cache=yes
+  tags:
+    - dependencies
+
+- name: Install System Packages
+  sudo: yes
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items:
+    - git
+    - libcurl3
+    - curl
+    - wget
+    - python-software-properties
+    - zip
+  tags: dependencies
+
+- name: Apply safe updates
+  sudo: yes
+  apt:
+    upgrade: safe
+  tags: dependencies

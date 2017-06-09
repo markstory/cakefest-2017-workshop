@@ -1,0 +1,17 @@
+---
+- name: modphp | ensure timezone is set in apache2 php.ini
+  lineinfile:
+    dest: /etc/php/7.0/apache2/php.ini
+    regexp: 'date.timezone ='
+    line: 'date.timezone = {{ server.timezone }}'
+
+- name: modphp | enabling opcache
+  lineinfile:
+    dest: /etc/php/7.0/apache2/php.ini
+    regexp: ';?opcache.enable=\d'
+    line: 'opcache.enable=1'
+
+- name: modphp | Enable new PHP in apache
+  apache2_module:
+    name: php7.0
+    state: present

@@ -1,0 +1,37 @@
+---
+vagrant_local:
+  vm:
+    base_box: trusty64
+    ip: 192.168.33.99
+    hostname: workshop-app
+    memory: '512'
+    sharedfolder: ./
+    useVagrantCloud: '1'
+    syncType: nfs
+
+login_users:
+  - name: deploy
+    groups: 'users,wheel'
+    createhome: True
+    state: present
+    ssh_key: files/deploy.key
+
+
+# Set to NFS mount point
+deploy_path: '/opt/workshop-app'
+
+app:
+  domain: workshop-app
+  hostname: workshop-app
+  hash_salt: "{{ vault_hash_salt }}"
+  root_dir: /opt/workshop-app
+  workspace_dir: /tmp/workspace
+  web_dir: /opt/workshop-app
+  debug: 'false'
+
+  # Don't clone the repo when running deploy tasks
+  clone_deploys: true
+
+apache:
+  docroot: /opt/workshop-app/webroot
+  servername: workshop-app

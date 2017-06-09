@@ -1,0 +1,109 @@
+---
+# Deployment tasks for the webapp used in production.
+#
+- hosts: web
+  sudo: true
+  vars_files:
+    - vars/all.yml
+  handlers:
+    - include: roles/apache/handlers/main.yml
+  tasks:
+    - name: Capture playbook runtime
+      shell: "date +%s"
+      register: playbook_runtime
+      ignore_errors: true
+      when: app.clone_deploys
+
+    - name: Set deploy path
+      set_fact:
+        deploy_path: "/opt/workshop-{{ playbook_runtime.stdout }}"
+      when: app.clone_deploys
+
+    - name: Clone repository & checkout {{ app_version|default('master') }}
+      git:
+        accept_hostkey: true
+        key_file: '/home/workshop/.ssh/repo_key'
+        repo: "{{ git.project_url }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ app_version|default('master') }}"
+      when: app.clone_deploys
+
+    - name: Install composer dependencies
+      command: "composer install --no-dev --prefer-dist"
+      args:
+        creates: "{{ deploy_path }}/vendor/autoload.php"
+        chdir: "{{ deploy_path }}"
+
+    - name: Make cache and log directories
+      file:
+        path: "{{ deploy_path }}/{{ item }}"
+        owner: www-data
+        group: www-data
+        mode: "0775"
+        state: directory
+      with_items:
+        - tmp
+        - tmp/cache
+        - tmp/cache/models
+        - tmp/cache/persistent
+        - webroot/cache
+      when: app.clone_deploys
+
+    - name: Create web app config file.
+      template:
+      args:
+        src: roles/webapp/templates/web_config.tpl
+        dest: "{{ deploy_path }}/config/app.php"
+
+    - name: Run migrations
+      command: "bin/cake migrations migrate"
+      register: migration_output
+      args:
+        chdir: "{{ deploy_path }}"
+
+    - name: Migration output
+      debug:
+        msg: "{{ migration_output.stdout_lines }}"
+
+    - name: Rebuild model cache
+      command: "bin/cake orm_cache build"
+      args:
+        chdir: "{{ deploy_path }}"
+      when: app.debug == 'false'
+
+    - name: Set permissions on model cache
+      file:
+        path: "{{ deploy_path }}/tmp/cache/models"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+        mode: "0775"
+      when: app.clone_deploys
+
+    # - name: Build assets
+    #   command: "bin/cake asset_compress build"
+    #   args:
+    #     chdir: "{{ deploy_path }}/web"
+    #   when: app.debug == 'false'
+
+    - name: Precompile Twig Templates
+      command: "bin/cake WyriHaximus/TwigView.compile all"
+      args:
+        chdir: "{{ deploy_path }}/web"
+      when: app.debug == 'false'
+      ignore_errors: True
+
+    - name: Link app into live directory.
+      file:
+        src: "{{ deploy_path }}"
+        dest: "{{ app.root_dir }}"
+        state: link
+      when: app.clone_deploys
+      notify: restart apache
+
+    - name: Remove old deployments (leaving 5 behind)
+      shell: "ls -tp | grep -P 'workshop-\\d+' | tail -n +6 | xargs rm -r"
+      args:
+        chdir: "/opt"
+      when: app.clone_deploys

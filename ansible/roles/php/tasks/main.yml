@@ -1,0 +1,37 @@
+---
+- name: Add ppa Repository
+  sudo: true
+  apt_repository:
+    repo: ppa:ondrej/{{ php.ppa }}
+  tags:
+    - php
+    - dependencies
+
+- name: Update apt
+  sudo: true
+  apt:
+    update_cache: true
+
+- name: Install php7
+  sudo: true
+  apt:
+    pkg: php7.0
+    state: latest
+  tags:
+    - php
+    - dependencies
+
+- name: Install PHP Packages
+  sudo: true
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  when: php.packages is defined
+  with_items: "{{ php.packages }}"
+  tags:
+    - php
+    - dependencies
+
+- include: configure.yml
+- include: pecl.yml
+- include: composer.yml

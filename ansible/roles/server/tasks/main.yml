@@ -1,0 +1,8 @@
+---
+- include: apt.yml
+- include: hosts.yml
+- include: user.yml
+- include: login_users.yml
+- include: timezone.yml
+- include: sshd.yml
+- include: ufw.yml

@@ -1,0 +1,20 @@
+---
+- name: Create application user
+  user:
+    name: workshop
+    group: www-data
+    createhome: True
+
+- name: Create .ssh dir for workshop user
+  file:
+    path: /home/workshop/.ssh
+    state: directory
+    owner: workshop
+    mode: '0700'
+
+- name: Create .ssh/config for workshop user
+  copy:
+    src: ssh_config
+    dest: /home/workshop/.ssh/config
+    owner: workshop
+    mode: '0600'

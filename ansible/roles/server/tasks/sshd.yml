@@ -1,0 +1,13 @@
+---
+- name: Copy sshd_config
+  template: src=sshd_config.tpl dest="/etc/ssh/sshd_config"
+  tags:
+    - config
+  notify: restart ssh
+
+- name: Allow ssh traffic
+  ufw:
+    rule: allow
+    port: ssh
+    proto: tcp
+  tags: ufw

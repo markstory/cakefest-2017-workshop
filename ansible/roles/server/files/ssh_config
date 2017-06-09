@@ -1,0 +1,4 @@
+host bitbucket.org
+  HostName bitbucket.org
+  IdentityFile ~/.ssh/bitbucket_key
+  User git

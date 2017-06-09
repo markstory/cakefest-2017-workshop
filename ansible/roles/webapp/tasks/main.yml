@@ -1,0 +1,10 @@
+---
+- name: Add workshop-app Apache VirtualHost
+  sudo: true
+  template:
+    src: vhost24.conf.tpl
+    dest: /etc/apache2/sites-available/000-default.conf
+  tags:
+    - config
+    - apache
+  notify: restart apache

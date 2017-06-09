@@ -1,0 +1,69 @@
+---
+- name: Install Apache
+  sudo: true
+  apt:
+    pkg: apache2
+    state: latest
+  tags:
+    - dependencies
+    - apache
+
+- name: Install Apache Modules
+  apache2_module:
+    state: present
+    name: "{{ item }}"
+  notify: restart apache
+  with_items:
+    - rewrite
+    - vhost_alias
+    - headers
+    - expires
+    - filter
+  tags:
+    - dependencies
+    - apache
+
+- name: Disable unused apache2 modules
+  apache2_module:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - vhost_alias
+    - status
+  tags:
+    - apache
+
+- name: Create apache2 config file
+  sudo: true
+  copy:
+    src: etc_apache2_apache2.conf
+    dest: /etc/apache2/apache2.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - config
+    - apache
+
+- name: Configure prefork module
+  sudo: true
+  copy:
+    src: etc_apache2_mpmprefork.conf
+    dest: /etc/apache2/mods-available/mpm_prefork.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - config
+    - apache
+
+- name: Set firewall rules for apache
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - http
+    - https
+  tags: ufw
+  notify: restart ufw

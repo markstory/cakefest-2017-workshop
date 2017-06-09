@@ -1,0 +1,6 @@
+# Development credentials.
+vault_hash_salt: '9860c399fcb43ef529be207779a86d22ad8536b32ca69d6fd229945c10d9b5f2'
+
+# MySQL
+vault_mysql_root_password: ''
+vault_mysql_password: password

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/all.yml
+  roles:
+    - vagrant_local
+    - server
+    - { role: mysql, tags: ['mysql'] }
+    - { role: webapp, tags: ['webapp'] }
+
+# - include: deploy.yml

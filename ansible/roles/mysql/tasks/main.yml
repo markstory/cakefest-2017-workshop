@@ -1,0 +1,75 @@
+---
+# Retrieve the current hostname, because {{ ansible_hostname }} still contains the old name
+- shell: hostname
+  register: current_hostname
+  tags:
+    - mysql
+    - config
+
+- name: mysql | Install MySQL Packages
+  sudo: yes
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - mysql-server
+    - mysql-client
+    - python-mysqldb
+  tags:
+    - mysql
+    - dependencies
+
+- name: mysql | Update root password for all root accounts
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    check_implicit_admin: yes
+    password: "{{ mysql.root_password }}"
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+  with_items:
+    - "{{ current_hostname.stdout | lower }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+  tags:
+    - mysql
+    - config
+
+- name: mysql | Create databases
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+  with_items:
+    - "{{ mysql.app_database }}"
+    - "{{ mysql.test_database }}"
+  tags:
+    - mysql
+    - config
+
+- name: mysql | Ensure anonymous users are not in the database
+  mysql_user:
+    name: ''
+    host: "{{ item }}"
+    state: absent
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+  with_items:
+    - localhost
+    - "{{ current_hostname.stdout | lower }}"
+  tags:
+    - mysql
+    - config
+
+- name: mysql | Create users
+  mysql_user:
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql.root_password }}"
+  with_items: mysql_users
+  tags:
+    - mysql
+    - config

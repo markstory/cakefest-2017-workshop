@@ -1,0 +1,28 @@
+---
+- name: Install package
+  sudo: yes
+  apt: pkg=ufw state=latest
+  tags:
+    - deps
+    - ufw
+
+- name: Enable ufw service
+  ufw:
+    state: enabled
+  tags: ufw
+
+- name: Deny incoming traffic
+  ufw:
+    direction: incoming
+    policy: deny
+    proto: tcp
+  tags: ufw
+  notify: restart ufw
+
+- name: Allow outcoming traffic
+  ufw:
+    direction: outgoing
+    policy: allow
+    proto: tcp
+  tags: ufw
+  notify: restart ufw

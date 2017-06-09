@@ -1,0 +1,36 @@
+---
+server:
+  timezone: UTC
+  locale: en_US.UTF-8
+
+php:
+  ppa: php
+  packages:
+    - php7.0-cli
+    - php7.0-intl
+    - php7.0-mysql
+    - php7.0-sqlite3
+    - php7.0-curl
+    - php7.0-simplexml
+    - php7.0-mbstring
+    - php7.0-bcmath
+    - php7.0-zip
+    - php7.0-soap
+    - php7.0-opcache
+  pecl_packages: []
+
+git:
+  project_url: 'https://github.com/markstory/cakefest-2017-workshop.git'
+
+mysql:
+  app_database: workshop
+  test_database: test_workshop
+  root_password: "{{ vault_mysql_root_password }}"
+  user: workshop
+  password: "{{ vault_mysql_password }}"
+  dump: ''
+
+mysql_users:
+  - user: workshop
+    password: "{{ vault_mysql_password }}"
+    priv: "workshop.*:ALL/test_workshop.*:ALL"
