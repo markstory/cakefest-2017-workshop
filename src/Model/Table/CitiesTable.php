@@ -57,7 +57,8 @@ class CitiesTable extends Table
 
         $validator
             ->requirePresence('name', 'create')
-            ->notEmpty('name');
+            ->notEmpty('name')
+            ->inList('name', ['rainbow', 'double rainbow']);
 
         $validator
             ->requirePresence('district', 'create')

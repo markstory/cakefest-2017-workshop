@@ -14,8 +14,12 @@
  */
 namespace App\Controller;
 
+use App\Services\CitiesService;
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
+use Pimple\Container;
+use Redis;
 
 /**
  * Application Controller
@@ -40,6 +44,7 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
+        $this->buildContainer();
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
@@ -50,6 +55,22 @@ class AppController extends Controller
          */
         //$this->loadComponent('Security');
         //$this->loadComponent('Csrf');
+    }
+
+    public function buildContainer()
+    {
+        $this->container = new Container();
+        $this->container['citiesService'] = function($c) {
+            return new CitiesService($c['citiesTable'], $c['redis']);
+        };
+        $this->container['citiesTable'] = function($c) {
+            return TableRegistry::get('Cities');
+        };
+        $this->container['redis'] = function($c) {
+            $redis = new Redis();
+            $redis->connect('localhost', 6379);
+            return $redis;
+        };
     }
 
     /**
@@ -70,5 +91,45 @@ class AppController extends Controller
         ) {
             $this->viewBuilder()->className('FractalEntities.Transformer');
         }
+    }
+
+    /**
+     * Dispatches the controller action. Checks that the action
+     * exists and isn't private.
+     *
+     * @return mixed The resulting response.
+     * @throws \LogicException When request is not set.
+     * @throws \Cake\Controller\Exception\MissingActionException When actions are not defined or inaccessible.
+     */
+    public function invokeAction()
+    {
+        $request = $this->request;
+        if (!isset($request)) {
+            throw new LogicException('No Request object configured. Cannot invoke action');
+        }
+        if (!$this->isAction($request->getParam('action'))) {
+            throw new MissingActionException([
+                'controller' => $this->name . 'Controller',
+                'action' => $request->getParam('action'),
+                'prefix' => $request->getParam('prefix') ?: '',
+                'plugin' => $request->getParam('plugin'),
+            ]);
+        }
+
+        $action = $this->request->getParam('action');
+        $reflector = new \ReflectionMethod($this, $action);
+        $params = $reflector->getParameters();
+        $args = [];
+        foreach ($params as $param) {
+            $paramName = $param->getName();
+            if (isset($this->container[$paramName])) {
+                $inject = $this->container[$paramName];
+                $args[] = $inject;
+            }
+        }
+        /* @var callable $callable */
+        $callable = [$this, $request->getParam('action')];
+
+        return $callable(...array_merge(array_values($request->getParam('pass')), $args));
     }
 }

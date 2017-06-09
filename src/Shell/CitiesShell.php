@@ -20,12 +20,24 @@ class CitiesShell extends Shell
     public function getOptionParser()
     {
         $parser = parent::getOptionParser();
-        $parser->description('Get a list of cities')
+        $importParser = clone $parser;
+
+        $parser->description('Interact with cities')
             ->addOption('page', [
                 'short' => 'p',
                 'help' => 'The page you want',
                 'default' => 1
             ]);
+
+        $importParser->addArgument('file', [
+            'help' => 'The file to import',
+            'required' => true
+        ]);
+        $parser->addSubcommand('import', [
+            'help' => 'Import cities',
+            'description' => 'Import cities from CSV files',
+            'parser' => $importParser
+        ]);
 
         return $parser;
     }
@@ -51,11 +63,44 @@ class CitiesShell extends Shell
             ->page($page);
 
         $r = $q->all()->toArray();
+        array_unshift($r, ['id' => 'id', 'name' => 'name', 'country_id' =>  'country', 'district' =>  'Region', 'population' =>  'Population']);
         $this->helper('Table')->output($r);
     }
 
     public function import()
     {
-        
+        $this->loadModel('Cities');
+        $file = $this->args[0];
+        if (!file_exists($file)) {
+            $this->error("Your file $file doesn't exist.");
+        }
+        $this->out('Preparing to import');
+        $csv = fopen($file, 'r');
+
+        $lines = [];
+        while (!feof($csv)) {
+            $line = fgetcsv($csv, 0, "\t");
+            if ($line[0] == 'id') {
+                $header = $line;
+                continue;
+            }
+            if ($line) {
+                $lines[] = array_combine($header, $line);
+            }
+        }
+        $progress = $this->helper('Progress');
+        $progress->init([
+            'total' => count($lines),
+        ]);
+        foreach ($lines as $line) {
+            $city = $this->Cities->newEntity($line);
+            if (!$this->Cities->save($city)) {
+                $this->error('You lose ' . json_encode($city->getErrors()));
+            }
+            usleep(50000);
+            $progress->increment();
+            $progress->draw();
+        }
+
     }
 }

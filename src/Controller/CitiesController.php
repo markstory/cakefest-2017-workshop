@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Event\Event;
 use Cake\Routing\Router;
 
 /**
@@ -13,7 +14,6 @@ use Cake\Routing\Router;
  */
 class CitiesController extends AppController
 {
-
     /**
      * Index method
      *
@@ -35,15 +35,15 @@ class CitiesController extends AppController
     /**
      * View method
      *
+     * @inject App\Services\CitiesService
+     *
      * @param string|null $id City id.
      * @return \Cake\Http\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function view($id = null, $citiesService)
     {
-        $city = $this->Cities->get($id, [
-            'contain' => ['Countries']
-        ]);
+        $city = $citiesService->get($id);
 
         $this->set('city', $city);
         $this->set('_serialize', ['city']);
@@ -54,17 +54,16 @@ class CitiesController extends AppController
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function add($citiesService)
     {
         $city = $this->Cities->newEntity();
         if ($this->request->is('post')) {
-            $city = $this->Cities->patchEntity($city, $this->request->getData());
-            if ($this->Cities->save($city)) {
-                $this->Flash->success(__('The city has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+            try {
+                $this->log('Did the add');
+                $city = $citiesService->add($this->request->getData());
+            } catch (\Exception $e) {
+                $this->Flash->error($e->getMessage());
             }
-            $this->Flash->error(__('The city could not be saved. Please, try again.'));
         }
         $countries = $this->Cities->Countries->find('list', ['limit' => 200]);
         $this->set(compact('city', 'countries'));
