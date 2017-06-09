@@ -1,0 +1,50 @@
+<nav class="large-3 medium-4 columns" id="actions-sidebar">
+    <ul class="side-nav">
+        <li class="heading">{{ __('Actions') }}</li>
+        <li>{{ Html.link(__('New City'), {action: 'add'})|raw }}</li>
+        <li>{{ Html.link(__('List Countries'), {'controller' : 'Countries', 'action' : 'index'})|raw }}</li>
+        <li>{{ Html.link(__('New Country'), {'controller' : 'Countries', 'action' : 'add'})|raw }}</li>
+        <li>{{ Html.link(__('Go to Canada'), {'country' : 'CAN', 'action' : 'index'})|raw }}</li>
+    </ul>
+</nav>
+<div class="cities index large-9 medium-8 columns content">
+    <h3>{{ __('Cities') }}</h3>
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th scope="col">{{ Paginator.sort('id')|raw }}</th>
+                <th scope="col">{{ Paginator.sort('name')|raw }}</th>
+                <th scope="col">{{ Paginator.sort('country_id')|raw }}</th>
+                <th scope="col">{{ Paginator.sort('district')|raw }}</th>
+                <th scope="col">{{ Paginator.sort('population')|raw }}</th>
+                <th scope="col" class="actions">{{ __('Actions') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for city in cities %}
+            <tr>
+                <td>{{ Number.format(city.id)|raw }}</td>
+                <td>{{ city.welcome }}</td>
+                <td>{{ Html.link(city.country.name, {'controller' : 'Countries', 'action' : 'view', 0: city.country.id})|raw }}</td>
+                <td>{{ city.district }}</td>
+                <td>{{ Number.format(city.population) }}</td>
+                <td class="actions">
+                    {{ Html.link(__('View'), {'action' : 'view', 0: city.id})|raw }}
+                    {{ Html.link(__('Edit'), {'action' : 'edit', 0: city.id})|raw }}
+                    {{ Form.postLink(__('Delete'), {'action' : 'delete', 0: city.id}, {'confirm' : __('Are you sure you want to delete # {0}?', city.id)})|raw }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="paginator">
+        <ul class="pagination">
+            {{ Paginator.first('<< ' ~ __('first'))|raw }}
+            {{ Paginator.prev('< ' ~ __('previous'))|raw }}
+            {{ Paginator.numbers()|raw }}
+            {{ Paginator.next(__('next') ~ ' >')|raw }}
+            {{ Paginator.last(__('last') ~ ' >>')|raw }}
+        </ul>
+        <p>{{ Paginator.counter({'format': __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')})|raw }}</p>
+    </div>
+</div>

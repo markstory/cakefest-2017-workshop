@@ -10,7 +10,9 @@
         "mobiledetect/mobiledetectlib": "2.*",
         "cakephp/migrations": "~1.0",
         "cakephp/plugin-installer": "~1.0",
-        "phpunit/phpunit": "^6.0"
+        "phpunit/phpunit": "^6.0",
+        "josegonzalez/cakephp-fractal-entities": "^3.1",
+        "wyrihaximus/twig-view": "^4.0"
     },
     "require-dev": {
         "psy/psysh": "@stable",

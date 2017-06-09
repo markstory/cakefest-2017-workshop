@@ -29,7 +29,7 @@
             <?php foreach ($cities as $city): ?>
             <tr>
                 <td><?= $this->Number->format($city->id) ?></td>
-                <td><?= h($city->name) ?></td>
+                <td><?= $city->name ?></td>
                 <td><?= $city->has('country') ? $this->Html->link($city->country->name, ['controller' => 'Countries', 'action' => 'view', $city->country->id]) : '' ?></td>
                 <td><?= h($city->district) ?></td>
                 <td><?= $this->Number->format($city->population) ?></td>

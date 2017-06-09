@@ -41,3 +41,24 @@ function table($name)
 {
     return \Cake\ORM\TableRegistry::get($name);
 }
+
+function sql($query)
+{
+    return $query->sql();
+}
+
+function help($object, $method = null)
+{
+    if (is_string($object)) {
+        list($class, $method) = explode('::', $object);
+        $reflection = new \ReflectionMethod($class, $method);
+    } else {
+        $reflection = new \ReflectionMethod($object, $method);
+    }
+    $comment = trim($reflection->getDocComment());
+    // Remove comment /** * and */
+    $comment = preg_replace('#^\/\*\*#m', '', $comment);
+    $comment = preg_replace('#^\s*\*#m', '', $comment);
+    $comment = preg_replace('#^\s*\**\/#m', '', $comment);
+    return $comment;
+}

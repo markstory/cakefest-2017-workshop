@@ -30,5 +30,4 @@ class City extends Entity
         '*' => true,
         'id' => false
     ];
-
 }

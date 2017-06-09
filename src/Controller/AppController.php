@@ -65,5 +65,10 @@ class AppController extends Controller
         ) {
             $this->set('_serialize', true);
         }
+        if (isset($this->viewVars['_serialize']) &&
+            in_array($this->response->type(), ['application/json', 'application/xml'])
+        ) {
+            $this->viewBuilder()->className('FractalEntities.Transformer');
+        }
     }
 }

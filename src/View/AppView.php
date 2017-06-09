@@ -11,20 +11,13 @@
  * @since     3.0.0
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace App\View;
 
-use Cake\View\View;
+use WyriHaximus\TwigView\View\TwigView;
 
-/**
- * Application View
- *
- * Your application’s default view class
- *
- * @link http://book.cakephp.org/3.0/en/views.html#the-app-view
- */
-class AppView extends View
+class AppView extends TwigView
 {
-
     /**
      * Initialization hook method.
      *
@@ -36,5 +29,9 @@ class AppView extends View
      */
     public function initialize()
     {
+        $this->loadHelper('Html');
+        $this->loadHelper('Paginator');
+        $this->loadHelper('Number');
+        $this->loadHelper('Form');
     }
 }
